@@ -13,7 +13,7 @@ pipeline{
     environment{
         SNAP_REPO = 'vprofile-repo'
         NEXUS_USER = 'admin'
-        NEXUS_PASS = 'admin123'
+        NEXUS_PASS = credentials('nexuspass')
         RELEASE_REPO = 'vprofile-release'
         CENTRAL_REPO = 'vpro-maven-central'
         NEXUSIP = '172.31.29.129'
@@ -94,6 +94,30 @@ pipeline{
                 )
             }
         }
+
+        stage("Ansible deploy to staging"){
+            steps{
+                ansiblePlaybook([
+                    inventory : 'ansible/stage.inventory',
+                    playbook: 'ansible/site.yml',
+                    installation: 'ansible',
+                    colorized: true,
+                    credentialsId: 'applogin',
+                    disableHostKeyChecking: true,
+                    extraVars : [
+                        USER: "admin",
+                        PASS: "${NEXUS_PASS}",
+                        nexusip: "172.31.29.129",
+                        reponame: "vprofile-release",
+                        groupid: "QA",
+                        time: "${env.BUILD_TIMESTAMP}",
+                        build: "${env.BUILD_ID}",
+                        artifactId: "vproapp",
+                        vprofile_version: "vproapp-${env.BUILD_ID}-${env.BUILD_TIMESTAMP}.war"
+                    ]
+                ])
+            }
+        }    
     }
     post{
         always{
