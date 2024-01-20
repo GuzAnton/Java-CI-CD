@@ -13,7 +13,7 @@ pipeline{
     environment{
         SNAP_REPO = 'vprofile-repo'
         NEXUS_USER = 'admin'
-        NEXUS_PASS = 'admin123'
+        NEXUS_PASS = credentials('nexuspass')
         RELEASE_REPO = 'vprofile-release'
         CENTRAL_REPO = 'vpro-maven-central'
         NEXUSIP = '172.31.29.129'
@@ -106,7 +106,7 @@ pipeline{
                     disableHostKeyChecking: true,
                     extraVars : [
                         USER: "admin",
-                        PASS: "admin123",
+                        PASS: "${NEXUS_PASS}",
                         nexusip: "172.31.29.129",
                         reponame: "vprofile-release",
                         groupid: "QA",
