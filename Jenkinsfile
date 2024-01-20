@@ -75,8 +75,8 @@ pipeline{
             }
         }
 
-        stage('Artifact Upload'){
-            steps{
+        stage("UploadArtifact") {
+            steps {
                 nexusArtifactUploader(
                     nexusVersion: 'nexus3',
                     protocol: 'http',
@@ -89,22 +89,22 @@ pipeline{
                         [artifactId: 'vproapp',
                          classifier: '',
                          file: 'target/vprofile-v2.war',
-                         type: 'war'] 
+                         type: 'war']
                     ]
                 )
             }
         }
-
-        stage("Ansible deploy to staging"){
-            steps{
+ 
+        stage('Ansible Deploy to staging') {
+            steps {
                 ansiblePlaybook([
-                    inventory : 'ansible/stage.inventory',
+                    inventory: 'ansible/stage.inventory',
                     playbook: 'ansible/site.yml',
                     installation: 'ansible',
                     colorized: true,
                     credentialsId: 'applogin',
                     disableHostKeyChecking: true,
-                    extraVars : [
+                    extraVars: [
                         USER: "admin",
                         PASS: "${NEXUS_PASS}",
                         nexusip: "172.31.29.129",
@@ -112,13 +112,14 @@ pipeline{
                         groupid: "QA",
                         time: "${env.BUILD_TIMESTAMP}",
                         build: "${env.BUILD_ID}",
-                        artifactId: "vproapp",
+                        artifactid: "vproapp",
                         vprofile_version: "vproapp-${env.BUILD_ID}-${env.BUILD_TIMESTAMP}.war"
                     ]
                 ])
             }
-        }    
+        }
     }
+
     post{
         always{
             echo 'Slack Notifications.'
